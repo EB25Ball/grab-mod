@@ -77,23 +77,22 @@
         </div>
     </div>
     <footer>
-        <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.X.X/dist/protobuf.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/protobufjs@7.X.X/dist/protobuf.js"></script>
     <script type="text/javascript">
-
         function readArrayBuffer(file) {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function(resolve, reject) {
                 let reader = new FileReader();
-                reader.onload = function () {
+                reader.onload = function() {
                     let data = reader.result;
-                    protobuf.load("proto/level.proto", function (err, root) {
-                        if (err) throw err;
+                    protobuf.load("proto/level.proto", function(err, root) {
+                        if(err) throw err;
                         let message = root.lookupType("COD.Level.Level");
                         let decoded = message.decode(new Uint8Array(data));
                         let object = message.toObject(decoded);
                         resolve(object);
                     });
                 }
-                reader.onerror = function () {
+                reader.onerror = function() {
                     reject(reader);
                 }
                 reader.readAsArrayBuffer(file);
@@ -101,26 +100,26 @@
         }
 
         function readAnimatedArrayBuffer(file) {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function(resolve, reject) {
                 let reader = new FileReader();
-                reader.onload = function () {
+                reader.onload = function() {
                     let data = reader.result;
-                    protobuf.load("proto-anim/level.proto", function (err, root) {
-                        if (err) throw err;
+                    protobuf.load("proto-anim/level.proto", function(err, root) {
+                        if(err) throw err;
                         let message = root.lookupType("COD.Level.Level");
                         let decoded = message.decode(new Uint8Array(data));
                         let object = message.toObject(decoded);
                         resolve(object);
                     });
                 }
-                reader.onerror = function () {
+                reader.onerror = function() {
                     reject(reader);
                 }
                 reader.readAsArrayBuffer(file);
             });
         }
 
-        function appendFile(e, anim = false) {
+        function appendFile(e, anim=false) {
             let files = e.target.files;
             let readers = [];
 
@@ -144,7 +143,7 @@
 
         }
 
-        function loadFile(e, anim = false) {
+        function loadFile(e, anim=false) {
             let files = e.target.files;
             let readers = [];
 
@@ -163,7 +162,7 @@
 
             Promise.all(readers).then((values) => {
                 credited = values[0];
-                if (credited.hasOwnProperty('description')) {
+                if(credited.hasOwnProperty('description')){
                     if (!credited.description.includes(".index - level modding")) {
                         credited["description"] += "  .index - level modding";
                     }
@@ -176,6 +175,31 @@
             });
 
         }
+        document.getElementById('download').addEventListener("click", function () {
+            obj = JSON.parse(document.getElementById('out').value);
+            console.log(obj);
+            protobuf.load("proto/level.proto", function(err, root) {
+                if(err) throw err;
+
+                let message = root.lookupType("COD.Level.Level");
+                let errMsg = message.verify(obj);
+                if(errMsg) throw Error(errMsg);
+                let buffer = message.encode(message.fromObject(obj)).finish();
+                
+                let blob = new Blob([buffer], {type: "application/octet-stream"});
+
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = (Date.now()).toString().slice(0, -3)+".level";
+                link.click();
+            });
+        }, false);
+
+        document.getElementById("copy").addEventListener('click', function () {
+            navigator.clipboard.writeText(document.getElementById('out').value);
+        }, false);
+
+
         function repeatLoop() {
             let obj1 = JSON.parse(document.getElementById('out').value);
             const num = document.getElementById("numInput").value;
@@ -212,26 +236,7 @@
             document.getElementById('out').value = JSON.stringify(obj1, null, 4);
           }
           
-          document.getElementById('download').addEventListener("click", function () {
-            obj = JSON.parse(document.getElementById('out').value);
-            console.log(obj);
-            protobuf.load("proto/level.proto", function(err, root) {
-                if(err) throw err;
-
-                let message = root.lookupType("COD.Level.Level");
-                let errMsg = message.verify(obj);
-                if(errMsg) throw Error(errMsg);
-                let buffer = message.encode(message.fromObject(obj)).finish();
-                
-                let blob = new Blob([buffer], {type: "application/octet-stream"});
-
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(blob);
-                link.download = (Date.now()).toString().slice(0, -3)+".level";
-                link.click();
-            });
-        }, false);
-
+        
         document.getElementById("copy").addEventListener('click', function () {
             navigator.clipboard.writeText(document.getElementById('out').value);
         }, false);
