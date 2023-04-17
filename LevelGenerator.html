@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Level JSON Editor | Grab Tools | twhlynch </title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BDS57RBQ3Q"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+  
+        gtag('config', 'G-BDS57RBQ3Q');
+      </script>
+      <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+      <script type="importmap">
+          {
+            "imports": {
+              "three": "https://unpkg.com/three@0.145.0/build/three.module.js"
+            }
+          }
+      </script>
+</head>
+
+<body>
+    <img src="spindex-small.gif" alt="" id="spindex">
+    <div class="title">Level JSON Editor
+    </div>
+    <div class="file-selectors">
+        <label for="file" id="file-custom">Choose Level!
+            <div id="file-display"></div>
+        </label>
+        <input type="file" name="file" id="file" accept=".level">
+    </div>
+    <p id="selected-file">Find .levels in <code>Android/data/com.slindev.grab_demo/levels/user</code> on your Quest
+        headset!</p>
+        <label for="numInput">Enter a number:</label>
+        <input type="number" id="numInput">
+        <button onclick="repeatLoop()">Repeat Loop</button>
+
+    <div id="buttons">
+        <button id="download">Download</button>
+        <button id="copy">Copy JSON</button>
+    </div>
+    <div class="editing">
+        <textarea type="text" id="out"></textarea>
+        <div class="leg">
+            <h3>shape</h3>
+            <ul>
+                <li>1000:CUBE</li>
+                <li>1001:SPHERE</li>
+                <li>1002:CYLINDER</li>
+                <li>1003:PYRAMID</li>
+                <li>1004:PRISM</li>
+            </ul>
+            <h3>type/material</h3>
+            <ul>
+                <li>0:DEFAULT</li>
+                <li>1:GRABBABLE</li>
+                <li>2:ICE</li>
+                <li>3:LAVA</li>
+                <li>4:WOOD</li>
+                <li>5:GRAPPLABLE</li>
+                <li>6:GRAPPLABLE_LAVA</li>
+                <li>7:GRABBABLE_CRUMBLING</li>
+                <li>8:DEFAULT_COLORED</li>
+                <li>9:BOUNCING</li>
+            </ul>
+        </div>
+    </div>
+    <div id="functions">
+        <div class="preset-functions">
+            <input type="submit" id="load-empty" value="Load Empty"></input>
+        </div>
+    </div>
+    <footer>
+        <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.X.X/dist/protobuf.js"></script>
+    <script type="text/javascript">
+
+        function readArrayBuffer(file) {
+            return new Promise(function (resolve, reject) {
+                let reader = new FileReader();
+                reader.onload = function () {
+                    let data = reader.result;
+                    protobuf.load("proto/level.proto", function (err, root) {
+                        if (err) throw err;
+                        let message = root.lookupType("COD.Level.Level");
+                        let decoded = message.decode(new Uint8Array(data));
+                        let object = message.toObject(decoded);
+                        resolve(object);
+                    });
+                }
+                reader.onerror = function () {
+                    reject(reader);
+                }
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function readAnimatedArrayBuffer(file) {
+            return new Promise(function (resolve, reject) {
+                let reader = new FileReader();
+                reader.onload = function () {
+                    let data = reader.result;
+                    protobuf.load("proto-anim/level.proto", function (err, root) {
+                        if (err) throw err;
+                        let message = root.lookupType("COD.Level.Level");
+                        let decoded = message.decode(new Uint8Array(data));
+                        let object = message.toObject(decoded);
+                        resolve(object);
+                    });
+                }
+                reader.onerror = function () {
+                    reject(reader);
+                }
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function appendFile(e, anim = false) {
+            let files = e.target.files;
+            let readers = [];
+
+            if (!files.length) return;
+
+            for (let i = 0; i < files.length; i++) {
+                let p = document.createElement('p');
+                p.innerText = files[i].name;
+                if (anim) {
+                    readers.push(readAnimatedArrayBuffer(files[i]));
+                } else {
+                    readers.push(readArrayBuffer(files[i]));
+                }
+            }
+
+            Promise.all(readers).then((values) => {
+                obj = JSON.parse(document.getElementById('out').value);
+                obj.levelNodes += values.levelNodes;
+                document.getElementById('out').value = JSON.stringify(obj, null, 4);
+            });
+
+        }
+
+        function loadFile(e, anim = false) {
+            let files = e.target.files;
+            let readers = [];
+
+            if (!files.length) return;
+
+            for (let i = 0; i < files.length; i++) {
+                let p = document.createElement('p');
+                p.innerText = files[i].name;
+                document.getElementById('selected-file').innerHTML = p.outerHTML;
+                if (anim) {
+                    readers.push(readAnimatedArrayBuffer(files[i]));
+                } else {
+                    readers.push(readArrayBuffer(files[i]));
+                }
+            }
+
+            Promise.all(readers).then((values) => {
+                credited = values[0];
+                if (credited.hasOwnProperty('description')) {
+                    if (!credited.description.includes(".index - level modding")) {
+                        credited["description"] += "  .index - level modding";
+                    }
+                } else {
+                    credited["description"] = ".index - level modding";
+                }
+                document.getElementById('out').value = JSON.stringify(credited, null, 4);
+                document.getElementById('out').style.display = "block";
+                document.getElementsByClassName('leg')[0].style.display = "flex";
+            });
+
+        }
+        function repeatLoop() {
+            let obj1 = JSON.parse(document.getElementById('out').value);
+            const num = document.getElementById("numInput").value;
+            const newLevelNode = {
+                "levelNodeStatic": {
+                  "shape": 1000,
+                  "material": 8,
+                  "position": {
+                    "x": 50.7958984375,
+                    "y": -3.4835004806518555,
+                    "z": -27.004186630249023
+                  },
+                  "scale": {
+                    "x": 87.0252685546875,
+                    "y": 1.2512651681900024,
+                    "z": 77.25424194335938
+                  },
+                  "rotation": {
+                    "x": -0.013857461512088776,
+                    "y": -0.11428159475326538,
+                    "z": -0.01423641201108694,
+                    "w": 0.9932499527931213
+                  },
+                  "color": {
+                    "r": 0.16666650772094727,
+                    "g": 0.8333333134651184,
+                    "a": 1
+                  }
+                },
+              };              
+            for (let i = 1; i <= num; i++) {
+                obj1.levelNodes.push(newLevelNode);
+            }
+            document.getElementById('out').value = JSON.stringify(obj1, null, 4);
+          }
+          
+          document.getElementById('download').addEventListener("click", function () {
+            obj = JSON.parse(document.getElementById('out').value);
+            console.log(obj);
+            protobuf.load("proto/level.proto", function(err, root) {
+                if(err) throw err;
+
+                let message = root.lookupType("COD.Level.Level");
+                let errMsg = message.verify(obj);
+                if(errMsg) throw Error(errMsg);
+                let buffer = message.encode(message.fromObject(obj)).finish();
+                
+                let blob = new Blob([buffer], {type: "application/octet-stream"});
+
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = (Date.now()).toString().slice(0, -3)+".level";
+                link.click();
+            });
+        }, false);
+
+        document.getElementById("copy").addEventListener('click', function () {
+            navigator.clipboard.writeText(document.getElementById('out').value);
+        }, false);
+        document.getElementById("load-empty").addEventListener('click', function () {
+            obj = {
+                "formatVersion": 6,
+                "title": "",
+                "creators": "",
+                "description": "",
+                "levelNodes": [],
+                "maxCheckpointCount": 0,
+                "ambienceSettings": {
+                    "skyZenithColor": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0,
+                        "a": 1
+                    },
+                    "skyHorizonColor": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0,
+                        "a": 1
+                    },
+                    "sunAltitude": 0,
+                    "sunAzimuth": 0,
+                    "sunSize": 1,
+                    "fogDDensity": 0
+                }
+            }
+            document.getElementById('out').value = JSON.stringify(obj, null, 4);
+        });
+        document.getElementById('file').addEventListener("change", function (e) { loadFile(e) }, false);
+        document.getElementById('out').value = JSON.stringify({
+            "formatVersion": 6,
+            "title": "",
+            "creators": "",
+            "description": "",
+            "levelNodes": [],
+            "maxCheckpointCount": 0,
+            "ambienceSettings": {
+                "skyZenithColor": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0,
+                    "a": 1
+                },
+                "skyHorizonColor": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0,
+                    "a": 1
+                },
+                "sunAltitude": 0,
+                "sunAzimuth": 0,
+                "sunSize": 1,
+                "fogDDensity": 0
+            }
+        }, null, 4);
+        document.getElementById('out').style.display = "block";
+        document.getElementsByClassName('leg')[0].style.display = "flex";
+    </script>
+</body>
+
+</html>

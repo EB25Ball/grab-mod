@@ -1,0 +1,399 @@
+html {
+    width: 100%;
+    height: 100%;
+    background-color: #eee;
+    background-image: url('convrist.jpg');
+    background-size: 300px;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2rem;
+    height: calc(90% - 2rem);
+    font-family: sans-serif;
+    width: 80%;
+    margin: 0;
+    margin-inline: auto;
+    padding: 2rem;
+}
+footer {
+    width: 100vw;
+    height: 3rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+    color: #666;
+    pointer-events: none;
+}
+footer a {
+    text-decoration: none;
+    color: #4CAF50;
+    pointer-events: all;
+}
+#file, #file-a, #file-append{
+    display: none;
+}
+#file-custom, #file-custom-a, #file-custom-append {
+    height: fit-content;
+    border: 2px dashed #aaa;
+    border-radius: 5px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    font-size: 20px;
+    color: #aaa;
+}
+#file-custom:hover, #file-custom-a:hover, #file-custom-append:hover {
+    border: 2px dashed #777;
+    color: #777;
+}
+.file-selectors {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+button, #compile, #copy, #download, #pixelate {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+#details input{
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+.editing{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+.leg{
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    margin: 20px;
+    padding: 5px;
+    margin-right: 0;
+    background-color: #4caf5077;
+    border-radius: 5px;
+    overflow: hidden;
+    color: transparent;
+}
+.leg::before {
+    content: "Hover for help";
+    position: absolute;
+    color: #fffa;
+    font-weight: bold;
+    transform: rotate(90deg);
+    letter-spacing: 2px;
+    width: 110px;
+}
+.leg:hover::before {
+    display: none;
+}
+.leg:hover {
+    width: 180px;
+    color: #000;
+}
+.leg ul{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    padding-block: 5px;
+    word-wrap: none;
+}
+.leg h3{
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: transparent;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.leg:hover h3 {
+    color: #000;
+}
+#out{
+    width: calc(100% - 10px);
+    height: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    font-size: 12px;
+    display: none;
+}
+#out:has(+.leg:hover) {
+    width: calc(100% - 200px);
+}
+#out::-webkit-scrollbar {
+    width: 6px;
+    height: 3px;
+}
+#out::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+#out::-webkit-scrollbar-thumb {
+    background: #888;
+}
+.title{
+    color: #4CAF50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 2rem;
+    font-weight: bolder;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+p{
+    font-size: 1.2rem;
+    color: #666;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.home{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 30%;
+    color: #4CAF50;
+}
+.home:hover{
+    background-color: #4CAF50;
+    color: white;
+}
+.home a{
+    text-decoration: none;
+    color: #4CAF50;
+}
+.home a:visited{
+    color: #4CAF50;
+}
+.main-page img{
+    width: 70px;
+    height: 70px;
+    border-radius: 30%;
+}
+.main-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: #333;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 700;
+    margin-top: auto;
+}
+@media screen and (max-width: 443px) {
+    footer{
+        font-size: 0;
+    }            
+    footer a {
+        font-size: 16px;
+        padding-inline: .4rem;
+    }
+}
+.slider{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-apart;
+    gap: 1rem;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.help-container .title:not(.help-container > .title){
+    display: inline-block;
+}
+.help-container a {
+    text-decoration: none;
+    color: #4CAF50;
+}
+.help-container > section > div > a {
+    padding-inline: 5px;
+    border-radius: 5px;
+}
+.help-container > section > p > a {
+    background-image: linear-gradient(to right, #d1e7d1 0, #4CAF50 100%);
+    background-size: 0 20%;
+    background-position: bottom left;
+    transition: background-size .7s;
+    background-repeat: no-repeat;
+}
+.help-container > section > p > a:hover{
+    background-size: 100% 20%;
+}
+.help-container > section > div > a:hover{
+    background-color: #4caf4f44;
+}
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #666;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+code {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.2rem;
+    color: #163b17;
+    background-color: #d1e7d1;
+    padding: 0 5px;
+    border-radius: 5px;
+    overflow-wrap: anywhere;
+}
+h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #666;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 0.5rem;
+}
+.idea {
+    font-size: 5rem;
+    color: #666;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 0.5rem;
+    animation: text-glow 1s ease-in-out infinite alternate;
+}
+@keyframes text-glow {
+    from {
+        text-shadow: none;
+    }
+    to {
+        text-shadow: 0 0 20px #4CAF50, 0 0 30px #4CAF50, 0 0 40px #4CAF50;
+    }
+}
+@media screen and (max-width: 606px) {
+    .help-container .title {
+        font-size: 1.5rem;
+    }
+    .help-container p, .help-container code {
+        font-size: 1.1rem;
+    }
+    .help-container h3 {
+        font-size: 1.2rem;
+    }
+}
+.AO::after {
+    content: "animations";
+    font-size: 0.7rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 500;
+    margin-top: -3px;
+    margin-bottom: 3px;
+    display: block;
+    height: 0;
+    overflow: show;
+}
+
+#levels-output {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.2rem;
+    color: #4CAF50;
+    margin-top: 1rem;
+    padding-bottom: 3rem;
+}
+
+#levels-output a {
+    text-align: center;
+}
+
+.direction-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#direction, .direction-wrapper input {
+    border: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+    color: #163b17;
+    background-color: #d1e7d1;
+    padding: 0 5px;
+}
+#functions, .preset-functions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding-bottom: 2rem;
+}
+.preset-functions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 800px;
+}
+.function {
+    display: flex;
+    flex-direction: row;
+}
+.function input, .preset-functions input {
+    width: 200px;
+    padding: 0.5rem;
+    border: 2px solid #4CAF50;
+}
+.function input[type="submit"], .preset-functions input {
+    width: 50px;
+    border: none;
+    background: #4CAF50;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    color: #fff;
+    cursor: pointer;
+}
+.preset-functions input {
+    width: auto;
+    padding-inline: 1rem;
+}
+#spindex {
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+#visual {
+    outline: #444 solid 3px;
+}
+#refresh {
+    position: absolute;
+    padding: 5px;
+}
