@@ -13,11 +13,51 @@
             <input type="file" name="file" id="file" accept=".level">
         </label>
     </div>
+<!-- Add this HTML snippet within the <body> tag of your existing code -->
+<div class="verified-level-form">
+    <h2>Add Verified Level</h2>
+    <form id="verified-level-form">
+        <label for="verified-level-json">Enter JSON data for verified level:</label><br>
+        <textarea id="verified-level-json" name="verified-level-json" rows="4" cols="50"></textarea><br>
+        <button type="button" id="add-verified-level">Add Verified Level</button>
+    </form>
+</div>
 
     <div id="console-output"></div>
 
     <script src="//cdn.jsdelivr.net/npm/protobufjs@7.X.X/dist/protobuf.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/string-similarity@1.4.0/dist/string-similarity.min.js"></script>
     <script type="text/javascript">
+        // Verified levels storage
+        // Add this JavaScript code after your existing code
+
+// Get references to form elements
+const verifiedLevelForm = document.getElementById('verified-level-form');
+const verifiedLevelJsonInput = document.getElementById('verified-level-json');
+const addVerifiedLevelButton = document.getElementById('add-verified-level');
+
+// Listen for the "Add Verified Level" button click
+addVerifiedLevelButton.addEventListener('click', function () {
+    const verifiedLevelJson = verifiedLevelJsonInput.value.trim();
+    
+    if (verifiedLevelJson) {
+        try {
+            const verifiedLevelData = JSON.parse(verifiedLevelJson);
+            addVerifiedLevel(verifiedLevelData);
+            console.log('Verified level added:', verifiedLevelData);
+            verifiedLevelJsonInput.value = ''; // Clear the input
+        } catch (error) {
+            console.error('Error parsing JSON:', error);
+        }
+    }
+});
+const verifiedLevels = [];
+
+        // Function to add verified level data to the storage
+        function addVerifiedLevel(levelData) {
+            verifiedLevels.push(levelData);
+        }
+
         document.getElementById('file').addEventListener("change", function (e) {
             const file = e.target.files[0];
             if (file) {
@@ -35,15 +75,42 @@
                     const decoded = message.decode(new Uint8Array(data));
                     const object = message.toObject(decoded);
                     console.log(object);
-                    displayLevelInfo(object);
+
+                    // Verify the level and display verification result
+                    const isVerified = verifyLevel(object);
+                    const verificationMessage = isVerified ? "Verified" : "Not Verified";
+                    displayLevelInfo(object, verificationMessage);
                 });
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function displayLevelInfo(levelData) {
+        function verifyLevel(userLevelData) {
+            // Compare user's level data with verified levels
+            const similarities = verifiedLevels.map(verifiedLevelData => {
+                const similarity = stringSimilarity.compareTwoStrings(
+                    JSON.stringify(userLevelData),
+                    JSON.stringify(verifiedLevelData)
+                );
+                return similarity;
+            });
+
+            // Set a threshold for similarity to consider the level verified
+            const similarityThreshold = 0.8;
+
+            // If there's a similarity above the threshold, consider it verified
+            const highestSimilarity = Math.max(...similarities);
+            const isVerified = highestSimilarity >= similarityThreshold;
+
+            return isVerified;
+        }
+
+        function displayLevelInfo(levelData, verificationStatus) {
             const consoleOutput = document.getElementById('console-output');
-            consoleOutput.innerHTML = "<pre>" + JSON.stringify(levelData, null, 4) + "</pre>";
+            consoleOutput.innerHTML = `
+                <pre>${JSON.stringify(levelData, null, 4)}</pre>
+                <p>Verification Status: ${verificationStatus}</p>
+            `;
         }
     </script>
 </body>
