@@ -87,42 +87,40 @@ document.getElementById('compare-button').addEventListener("click", function () 
         function compareDataPatterns() {
     if (levelData && verifiedDataArray.length > 0) {
         const consoleOutput = document.getElementById('console-output');
-        let resultsHTML = "<pre>Similarity Results:</pre>";
-       const threshold =0.8
-        for (let verifiedDataEntrys of verifiedDataArray) {
-            const similarity = calculateSimilarity(levelData, verifiedDataEntrys);
-            const verificationResult = similarity >= threshold ? "Verified" : "Not Verified";
-            resultsHTML += `<pre>Similarity: ${similarity.toFixed(2)}, Verification Result: ${verificationResult}</pre>`;
+        let resultsHTML = "<pre>Pattern Matching Results:</pre>";
+        
+        for (let verifiedDataEntry of verifiedDataArray) {
+            const matchedPattern = matchPattern(levelData, verifiedDataEntry);
+            const verificationResult = matchedPattern ? "Verified" : "Not Verified";
+            resultsHTML += `<pre>Verification Result: ${verificationResult}</pre>`;
         }
 
         consoleOutput.innerHTML = resultsHTML;
     }
 }
 
-function calculateSimilarity(obj1, obj2) {
-    const keys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
-
-    const vector1 = [];
-    const vector2 = [];
-
-    for (const key of keys) {
-        const value1 = obj1[key] || 0;
-        const value2 = obj2[key] || 0;
-        vector1.push(value1);
-        vector2.push(value2);
+// Implement the pattern matching function
+function matchPattern(objToMatch, patternObj) {
+    for (const key in patternObj) {
+        if (patternObj.hasOwnProperty(key)) {
+            if (typeof patternObj[key] === 'object') {
+                if (!matchPattern(objToMatch[key], patternObj[key])) {
+                    return false;
+                }
+            } else {
+                if (objToMatch[key] !== patternObj[key]) {
+                    return false;
+                }
+            }
+        }
     }
-
-    const dotProduct = vector1.reduce((sum, value1, index) => sum + value1 * vector2[index], 0);
-    const magnitude1 = Math.sqrt(vector1.reduce((sum, value) => sum + value * value, 0));
-    const magnitude2 = Math.sqrt(vector2.reduce((sum, value) => sum + value * value, 0));
-
-    if (magnitude1 === 0 || magnitude2 === 0) {
-        return 0; // Avoid division by zero
-    }
-
-    return dotProduct / (magnitude1 * magnitude2);
+    return true;
 }
 
+
+
+
+       
     </script>
 </body>
 
