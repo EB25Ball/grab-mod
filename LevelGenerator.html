@@ -92,6 +92,8 @@
 
 
                 const similarity = calculateSimilarity(levelData, verifiedDataArray);
+                                const threshold = 0.8;
+
                 const verificationResult = similarity >= threshold ? "Verified" : "Not Verified";
                 resultsHTML += `<pre>Similarity: ${similarity.toFixed(2)}, Verification Result: ${verificationResult}</pre>`;
 
