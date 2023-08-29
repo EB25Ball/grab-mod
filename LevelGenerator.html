@@ -26,8 +26,9 @@
     <div id="console-output"></div>
 
     <script src="//cdn.jsdelivr.net/npm/protobufjs@7.X.X/dist/protobuf.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/string-similarity@1.4.0/dist/string-similarity.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/string-similarity@1.4.0/dist/string-similarity.min.js"></script>
     <script type="text/javascript">
+const stringSimilarity = require('string-similarity');
         // Verified levels storage
         // Add this JavaScript code after your existing code
 
@@ -85,26 +86,25 @@ const verifiedLevels = [];
             reader.readAsArrayBuffer(file);
         }
 
-        function verifyLevel(userLevelData) {
-            // Compare user's level data with verified levels
-            const similarities = verifiedLevels.map(verifiedLevelData => {
-                const similarity = stringSimilarity.compareTwoStrings(
-                    JSON.stringify(userLevelData),
-                    JSON.stringify(verifiedLevelData)
-                );
-                return similarity;
-            });
+       function verifyLevel(userLevelData) {
+    // Compare user's level data with verified levels
+    const similarities = verifiedLevels.map(verifiedLevelData => {
+        const similarity = stringSimilarity.compareTwoStrings(
+            JSON.stringify(userLevelData),
+            JSON.stringify(verifiedLevelData)
+        );
+        return similarity;
+    });
 
-            // Set a threshold for similarity to consider the level verified
-            const similarityThreshold = 0.8;
+    // Set a threshold for similarity to consider the level verified
+    const similarityThreshold = 0.8;
 
-            // If there's a similarity above the threshold, consider it verified
-            const highestSimilarity = Math.max(...similarities);
-            const isVerified = highestSimilarity >= similarityThreshold;
+    // If there's a similarity above the threshold, consider it verified
+    const highestSimilarity = Math.max(...similarities);
+    const isVerified = highestSimilarity >= similarityThreshold;
 
-            return isVerified;
-        }
-
+    return isVerified;
+}
         function displayLevelInfo(levelData, verificationStatus) {
             const consoleOutput = document.getElementById('console-output');
             consoleOutput.innerHTML = `
