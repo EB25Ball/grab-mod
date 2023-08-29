@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -15,12 +16,16 @@
         <label for="verified-file">Choose a Verified Level File:
             <input type="file" name="verified-file" id="verified-file" accept=".level">
         </label>
+        <button id="add-verified">Add Verified Level</button>
     </div>
 
     <div id="console-output"></div>
 
     <script src="//cdn.jsdelivr.net/npm/protobufjs@7.X.X/dist/protobuf.js"></script>
     <script type="text/javascript">
+        let levelData = null;
+        let verifiedDataArray = [];
+
         document.getElementById('file').addEventListener("change", function (e) {
             const file = e.target.files[0];
             if (file) {
@@ -31,9 +36,18 @@
         document.getElementById('verified-file').addEventListener("change", function (e) {
             const verifiedFile = e.target.files[0];
             if (verifiedFile) {
-                readLevelFile(verifiedFile);
+                readVerifiedLevelFile(verifiedFile);
             }
         }, false);
+
+        document.getElementById('add-verified').addEventListener("click", function () {
+            const verifiedFileInput = document.getElementById('verified-file');
+            const verifiedFile = verifiedFileInput.files[0];
+            if (verifiedFile) {
+                readVerifiedLevelFile(verifiedFile);
+                verifiedFileInput.value = null; // Clear input
+            }
+        });
 
         function readLevelFile(file) {
             const reader = new FileReader();
@@ -43,9 +57,27 @@
                     if (err) throw err;
                     const message = root.lookupType("COD.Level.Level");
                     const decoded = message.decode(new Uint8Array(data));
-                    const object = message.toObject(decoded);
-                    console.log(object);
-                    displayLevelInfo(object);
+                    levelData = message.toObject(decoded);
+                    console.log(levelData);
+                    displayLevelInfo(levelData);
+                    compareDataPatterns();
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function readVerifiedLevelFile(file) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const data = reader.result;
+                protobuf.load("proto/level.proto", function (err, root) {
+                    if (err) throw err;
+                    const message = root.lookupType("COD.Level.Level");
+                    const decoded = message.decode(new Uint8Array(data));
+                    const verifiedData = message.toObject(decoded);
+                    console.log(verifiedData);
+                    verifiedDataArray.push(verifiedData);
+                    compareDataPatterns();
                 });
             };
             reader.readAsArrayBuffer(file);
@@ -54,6 +86,31 @@
         function displayLevelInfo(levelData) {
             const consoleOutput = document.getElementById('console-output');
             consoleOutput.innerHTML = "<pre>" + JSON.stringify(levelData, null, 4) + "</pre>";
+        }
+
+        function compareDataPatterns() {
+            if (levelData && verifiedDataArray.length > 0) {
+                let isVerified = false;
+                for (const verifiedData of verifiedDataArray) {
+                    const similarity = calculateSimilarity(levelData, verifiedData);
+                    const threshold = 0.8;
+                    if (similarity >= threshold) {
+                        isVerified = true;
+                        break; // No need to check further
+                    }
+                }
+                const verificationResult = isVerified ? "Verified" : "Not Verified";
+                const consoleOutput = document.getElementById('console-output');
+                consoleOutput.innerHTML = `<pre>Verification Result: ${verificationResult}</pre>`;
+            }
+        }
+
+        function calculateSimilarity(obj1, obj2) {
+            const set1 = new Set(Object.keys(obj1));
+            const set2 = new Set(Object.keys(obj2));
+            const intersection = new Set([...set1].filter(x => set2.has(x)));
+            const union = new Set([...set1, ...set2]);
+            return intersection.size / union.size;
         }
     </script>
 </body>
