@@ -16,15 +16,16 @@
         <label for="verified-file">Choose a Verified Level File:
             <input type="file" name="verified-file" id="verified-file" accept=".level">
         </label>
-        <button id="add-verified">Add Verified Level</button>
     </div>
+    <button id="compare-button">Compare to Verified Data</button>
 
     <div id="console-output"></div>
 
     <script src="//cdn.jsdelivr.net/npm/protobufjs@7.X.X/dist/protobuf.js"></script>
     <script type="text/javascript">
         let levelData = null;
-        let verifiedDataArray = [];
+        let verifiedData = null;
+        let verifiedDataArray = []; // Array to store verified data entries
 
         document.getElementById('file').addEventListener("change", function (e) {
             const file = e.target.files[0];
@@ -39,15 +40,10 @@
                 readVerifiedLevelFile(verifiedFile);
             }
         }, false);
-
-        document.getElementById('add-verified').addEventListener("click", function () {
-            const verifiedFileInput = document.getElementById('verified-file');
-            const verifiedFile = verifiedFileInput.files[0];
-            if (verifiedFile) {
-                readVerifiedLevelFile(verifiedFile);
-                verifiedFileInput.value = null; // Clear input
-            }
-        });
+// Add this after your other event listeners
+document.getElementById('compare-button').addEventListener("click", function () {
+    compareDataToVerifiedArray();
+}, false);
 
         function readLevelFile(file) {
             const reader = new FileReader();
@@ -60,28 +56,29 @@
                     levelData = message.toObject(decoded);
                     console.log(levelData);
                     displayLevelInfo(levelData);
-                    compareDataPatterns();
+                   // compareDataPatterns();
                 });
             };
             reader.readAsArrayBuffer(file);
         }
 
         function readVerifiedLevelFile(file) {
-            const reader = new FileReader();
-            reader.onload = function () {
-                const data = reader.result;
-                protobuf.load("proto/level.proto", function (err, root) {
-                    if (err) throw err;
-                    const message = root.lookupType("COD.Level.Level");
-                    const decoded = message.decode(new Uint8Array(data));
-                    const verifiedData = message.toObject(decoded);
-                    console.log(verifiedData);
-                    verifiedDataArray.push(verifiedData);
-                    compareDataPatterns();
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        }
+    const reader = new FileReader();
+    reader.onload = function () {
+        const data = reader.result;
+        protobuf.load("proto/level.proto", function (err, root) {
+            if (err) throw err;
+            const message = root.lookupType("COD.Level.Level");
+            const decoded = message.decode(new Uint8Array(data));
+            const verifiedDataEntry = message.toObject(decoded);
+            verifiedDataArray.push(verifiedDataEntry); // Store verified data entry in the array
+            console.log(verifiedDataArray); 
+            console.log(verifiedDataEntry); // Optional: log the updated array
+        });
+    };
+    reader.readAsArrayBuffer(file);
+}
+
 
         function displayLevelInfo(levelData) {
             const consoleOutput = document.getElementById('console-output');
@@ -89,26 +86,24 @@
         }
 
         function compareDataPatterns() {
-            if (levelData && verifiedDataArray.length > 0) {
-                console.log("Similarity Values:");
-                for (const verifiedData of verifiedDataArray) {
-                    const similarity = calculateSimilarity(levelData, verifiedData);
-                    console.log(similarity);
-                    const threshold = 0.8;
-                    if (similarity >= threshold) {
-                        const verificationResult = "Verified";
-                        const consoleOutput = document.getElementById('console-output');
-                        consoleOutput.innerHTML = `<pre>Verification Result: ${verificationResult}</pre>`;
-                        return;
-                    }
-                }
-                const verificationResult = "Not Verified";
+            if (levelData && verifiedDataEntry) {
+                // Compare the data patterns and calculate similarity
+                const similarity = calculateSimilarity(levelData, verifiedDataEntry);
+                
+                // Set a threshold for verification
+                const threshold = 0.8;
+                
+                // Verify based on similarity
+                const verificationResult = similarity >= threshold ? "Verified" : "Not Verified";
+                
+                // Display verification result
                 const consoleOutput = document.getElementById('console-output');
                 consoleOutput.innerHTML = `<pre>Verification Result: ${verificationResult}</pre>`;
             }
         }
 
         function calculateSimilarity(obj1, obj2) {
+            // Simple Jaccard index calculation for demonstration
             const set1 = new Set(Object.keys(obj1));
             const set2 = new Set(Object.keys(obj2));
             const intersection = new Set([...set1].filter(x => set2.has(x)));
