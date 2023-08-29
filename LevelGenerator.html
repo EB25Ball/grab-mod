@@ -99,7 +99,7 @@ document.getElementById('compare-button').addEventListener("click", function () 
     }
 }
 
-function calculateCosineSimilarity(obj1, obj2) {
+function calculateSimilarity(obj1, obj2) {
     const keys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
 
     const vector1 = [];
