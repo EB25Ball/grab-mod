@@ -40,10 +40,10 @@
                 readVerifiedLevelFile(verifiedFile);
             }
         }, false);
-// Add this after your other event listeners
-document.getElementById('compare-button').addEventListener("click", function () {
-    compareDataPatterns();
-}, false);
+        // Add this after your other event listeners
+        document.getElementById('compare-button').addEventListener("click", function () {
+            compareDataPatterns();
+        }, false);
 
         function readLevelFile(file) {
             const reader = new FileReader();
@@ -56,28 +56,28 @@ document.getElementById('compare-button').addEventListener("click", function () 
                     levelData = message.toObject(decoded);
                     console.log(levelData);
                     displayLevelInfo(levelData);
-                   // compareDataPatterns();
+                    // compareDataPatterns();
                 });
             };
             reader.readAsArrayBuffer(file);
         }
 
         function readVerifiedLevelFile(file) {
-    const reader = new FileReader();
-    reader.onload = function () {
-        const data = reader.result;
-        protobuf.load("proto/level.proto", function (err, root) {
-            if (err) throw err;
-            const message = root.lookupType("COD.Level.Level");
-            const decoded = message.decode(new Uint8Array(data));
-            const verifiedDataEntry = message.toObject(decoded);
-            verifiedDataArray.push(verifiedDataEntry); // Store verified data entry in the array
-            console.log(verifiedDataArray); 
-            console.log(verifiedDataEntry); // Optional: log the updated array
-        });
-    };
-    reader.readAsArrayBuffer(file);
-}
+            const reader = new FileReader();
+            reader.onload = function () {
+                const data = reader.result;
+                protobuf.load("proto/level.proto", function (err, root) {
+                    if (err) throw err;
+                    const message = root.lookupType("COD.Level.Level");
+                    const decoded = message.decode(new Uint8Array(data));
+                    const verifiedDataEntry = message.toObject(decoded);
+                    verifiedDataArray.push(verifiedDataEntry); // Store verified data entry in the array
+                    console.log(verifiedDataArray);
+                    console.log(verifiedDataEntry); // Optional: log the updated array
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
 
 
         function displayLevelInfo(levelData) {
@@ -86,21 +86,20 @@ document.getElementById('compare-button').addEventListener("click", function () 
         }
 
         function compareDataPatterns() {
-            if (levelData && verifiedDataEntry) {
-                // Compare the data patterns and calculate similarity
-                const similarity = calculateSimilarity(levelData, verifiedDataEntry);
-                
-                // Set a threshold for verification
-                const threshold = 0.8;
-                
-                // Verify based on similarity
-                const verificationResult = similarity >= threshold ? "Verified" : "Not Verified";
-                
-                // Display verification result
+            if (levelData && verifiedDataArray.length) {
                 const consoleOutput = document.getElementById('console-output');
-                consoleOutput.innerHTML = `<pre>Verification Result: ${verificationResult}</pre>`;
+                let resultsHTML = "<pre>Similarity Results:</pre>";
+
+
+                const similarity = calculateSimilarity(levelData, verifiedDataArray);
+                const verificationResult = similarity >= threshold ? "Verified" : "Not Verified";
+                resultsHTML += `<pre>Similarity: ${similarity.toFixed(2)}, Verification Result: ${verificationResult}</pre>`;
+
+
+                consoleOutput.innerHTML = resultsHTML;
             }
         }
+
 
         function calculateSimilarity(obj1, obj2) {
             // Simple Jaccard index calculation for demonstration
