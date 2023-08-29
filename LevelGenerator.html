@@ -99,31 +99,31 @@ document.getElementById('compare-button').addEventListener("click", function () 
     }
 }
 
-
 function calculateSimilarity(obj1, obj2) {
-    // Calculate the dot product of values for common keys
-    let dotProduct = 0;
-    let magnitude1 = 0;
-    let magnitude2 = 0;
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
 
-    for (const key of Object.keys(obj1)) {
-        if (obj2.hasOwnProperty(key)) {
-            dotProduct += obj1[key] * obj2[key];
-        }
-        magnitude1 += obj1[key] * obj1[key];
+    const sharedKeys = keys1.filter(key => keys2.includes(key));
+    const numSharedKeys = sharedKeys.length;
+
+    if (numSharedKeys === 0) {
+        return 0; // No shared properties, completely dissimilar
     }
 
-    for (const value of Object.values(obj2)) {
-        magnitude2 += value * value;
+    let similaritySum = 0;
+
+    for (const key of sharedKeys) {
+        const value1 = obj1[key];
+        const value2 = obj2[key];
+
+        // Assume values are numbers for simplicity
+        similaritySum += 1 - Math.abs(value1 - value2); // Calculate similarity based on absolute difference
     }
 
-    if (magnitude1 === 0 || magnitude2 === 0) {
-        return 0; // Handle cases with zero magnitudes
-    }
-
-    const similarity = dotProduct / (Math.sqrt(magnitude1) * Math.sqrt(magnitude2));
-    return similarity;
+    const averageSimilarity = similaritySum / numSharedKeys;
+    return averageSimilarity;
 }
+
 
     </script>
 </body>
