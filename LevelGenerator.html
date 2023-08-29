@@ -99,29 +99,28 @@ document.getElementById('compare-button').addEventListener("click", function () 
     }
 }
 
-function calculateSimilarity(obj1, obj2) {
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
+function calculateCosineSimilarity(obj1, obj2) {
+    const keys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
 
-    const sharedKeys = keys1.filter(key => keys2.includes(key));
-    const numSharedKeys = sharedKeys.length;
+    const vector1 = [];
+    const vector2 = [];
 
-    if (numSharedKeys === 0) {
-        return 0; // No shared properties, completely dissimilar
+    for (const key of keys) {
+        const value1 = obj1[key] || 0;
+        const value2 = obj2[key] || 0;
+        vector1.push(value1);
+        vector2.push(value2);
     }
 
-    let similaritySum = 0;
+    const dotProduct = vector1.reduce((sum, value1, index) => sum + value1 * vector2[index], 0);
+    const magnitude1 = Math.sqrt(vector1.reduce((sum, value) => sum + value * value, 0));
+    const magnitude2 = Math.sqrt(vector2.reduce((sum, value) => sum + value * value, 0));
 
-    for (const key of sharedKeys) {
-        const value1 = obj1[key];
-        const value2 = obj2[key];
-
-        // Assume values are numbers for simplicity
-        similaritySum += 1 - Math.abs(value1 - value2); // Calculate similarity based on absolute difference
+    if (magnitude1 === 0 || magnitude2 === 0) {
+        return 0; // Avoid division by zero
     }
 
-    const averageSimilarity = similaritySum / numSharedKeys;
-    return averageSimilarity;
+    return dotProduct / (magnitude1 * magnitude2);
 }
 
 
