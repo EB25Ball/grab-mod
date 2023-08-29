@@ -90,7 +90,7 @@ document.getElementById('compare-button').addEventListener("click", function () 
         let resultsHTML = "<pre>Similarity Results:</pre>";
        const threshold =0.8
         for (let verifiedDataEntrys of verifiedDataArray) {
-            const similarity = calculateSimilarity(levelData, verifiedDataEntry);
+            const similarity = calculateSimilarity(levelData, verifiedDataEntrys);
             const verificationResult = similarity >= threshold ? "Verified" : "Not Verified";
             resultsHTML += `<pre>Similarity: ${similarity.toFixed(2)}, Verification Result: ${verificationResult}</pre>`;
         }
