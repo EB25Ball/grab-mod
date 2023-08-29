@@ -90,16 +90,19 @@
 
         function compareDataPatterns() {
             if (levelData && verifiedDataArray.length > 0) {
-                let isVerified = false;
+                console.log("Similarity Values:");
                 for (const verifiedData of verifiedDataArray) {
                     const similarity = calculateSimilarity(levelData, verifiedData);
+                    console.log(similarity);
                     const threshold = 0.8;
                     if (similarity >= threshold) {
-                        isVerified = true;
-                        break; // No need to check further
+                        const verificationResult = "Verified";
+                        const consoleOutput = document.getElementById('console-output');
+                        consoleOutput.innerHTML = `<pre>Verification Result: ${verificationResult}</pre>`;
+                        return;
                     }
                 }
-                const verificationResult = isVerified ? "Verified" : "Not Verified";
+                const verificationResult = "Not Verified";
                 const consoleOutput = document.getElementById('console-output');
                 consoleOutput.innerHTML = `<pre>Verification Result: ${verificationResult}</pre>`;
             }
