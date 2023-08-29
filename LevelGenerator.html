@@ -86,7 +86,7 @@
         }
         // Inside the compareDataPatterns function
         function compareDataPatterns() {
-            if (levelData && verifiedDataArray.length > 0) {
+            if (levelData && verifiedDataArray.length ) {
                 const consoleOutput = document.getElementById('console-output');
                 let resultsHTML = "<pre>Pattern Matching Results:</pre>";
 
@@ -95,14 +95,14 @@
                 const verifiedShapeCounts = {}; // { shape: count, ... }
                 // ... calculate counts for other attributes
 
-                for (let verifiedDataEntry of verifiedDataArray) {
+                for (let verifiedDataEntrys of verifiedDataArray) {
                     // Update complexity counts
-                    const verifiedComplexityRange = getComplexityRange(verifiedDataEntry.complexity);
+                    const verifiedComplexityRange = getComplexityRange(verifiedDataEntrys.complexity);
                     verifiedComplexityCounts[verifiedComplexityRange] =
                         (verifiedComplexityCounts[verifiedComplexityRange] || 0) + 1;
 
                     // Update shape counts
-                    const verifiedShape = verifiedDataEntry.levelNodes[0].levelNodeStatic.shape;
+                    const verifiedShape = verifiedDataEntrys.levelNodes[0].levelNodeStatic.shape;
                     verifiedShapeCounts[verifiedShape] = (verifiedShapeCounts[verifiedShape] || 0) + 1;
 
                     // ... update counts for other attributes
